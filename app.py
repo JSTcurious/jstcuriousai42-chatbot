@@ -7,7 +7,7 @@ print("Using device:", device)
 
 chatbot = pipeline(
     "text-generation",
-    model="sshleifer/tiny-gpt2",  # small model to stay within memory limits
+    model="distilgp2",
     device=0 if device.type == "cuda" else -1,
     max_new_tokens=100,
     do_sample=True,
