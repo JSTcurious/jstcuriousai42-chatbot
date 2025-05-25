@@ -7,7 +7,7 @@ print("Using device:", device)
 
 chatbot = pipeline(
     "text-generation",
-    model="distilgp2",
+    model="distilgpt2",
     device=0 if device.type == "cuda" else -1,
     max_new_tokens=100,
     do_sample=True,
