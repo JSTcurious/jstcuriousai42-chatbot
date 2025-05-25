@@ -1,5 +1,6 @@
 gradio==5.31.0
-transformers==4.40.2
-torch==2.1.2
+transformers==4.42.2
+torch==2.2.2
 accelerate
+numpy<2
 
