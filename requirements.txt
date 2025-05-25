@@ -3,4 +3,5 @@ transformers==4.42.2
 torch==2.2.2
 accelerate
 numpy<2
+sentencepiece
 

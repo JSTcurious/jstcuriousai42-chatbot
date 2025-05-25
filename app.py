@@ -10,13 +10,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Load tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=hf_token)
+tokenizer = AutoTokenizer.from_pretrained(model_id, token=hf_token)
+
+tokenizer = AutoTokenizer.from_pretrained(model_id, token=hf_token)
 
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
+    token=hf_token,
     device_map="auto",
-    torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
-    use_auth_token=hf_token
+    torch_dtype=torch.bfloat16
 )
 
 # Define response function
