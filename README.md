@@ -1,17 +1,13 @@
-# JSTcuriousAI42 Chatbot 🤖
+---
+title: JST Curious AI Chatbot
+emoji: 🤖
+colorFrom: turquoise
+colorTo: blue
+sdk: gradio
+sdk_version: "4.16.0"
+app_file: app.py
+pinned: false
+---
 
-This is a lightweight GenAI chatbot powered by HuggingFace's Zephyr-7B, deployed via Gradio.
+A chatbot assistant powered by Hugging Face models and APIs, part of the `jstcuriousai42.com` portal — where curiosity meets intelligent systems.
 
-## 🚀 Features
-- Gradio-based web UI
-- GPU-accelerated inference (T4)
-- Custom prompt/response cleanup
-
-## 🧠 Model
-Currently using `HuggingFaceH4/zephyr-7b-beta`. You can swap in `mistralai/Mistral-7B-Instruct-v0.2` or others.
-
-## 🛠️ Setup
-
-```bash
-pip install -r requirements.txt
-python app.py
