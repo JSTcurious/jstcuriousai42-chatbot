@@ -1,40 +1,35 @@
-# Import Gradio for building the web UI
 import gradio as gr
-
-# Import the Hugging Face Transformers pipeline
+import torch
 from transformers import pipeline
 
-# Initialize the text generation pipeline using Zephyr-7B-Beta model
-# This loads the model and sets up generation parameters
+# Smart device setting: use GPU if available, else CPU
+device = 0 if torch.cuda.is_available() else -1
+print(f"Using device: {'GPU' if device == 0 else 'CPU'}")
+
+# Load the model pipeline
 chatbot = pipeline(
-    "text-generation",                        # Specify task type
-    model="HuggingFaceH4/zephyr-7b-beta",     # You can swap in "mistralai/Mistral-7B-Instruct-v0.2"
-    device=0,                                 # Use GPU (device=0); -1 for CPU
-    max_new_tokens=256,                       # Limit on response length
-    do_sample=True,                           # Enable sampling (more creative responses)
-    temperature=0.7                           # Controls randomness (lower = more focused, higher = more diverse)
+    "text-generation",
+    model="HuggingFaceH4/zephyr-7b-beta",
+    device=device,
+    max_new_tokens=256,
+    do_sample=True,
+    temperature=0.7,
 )
 
-# Function to generate response from the chatbot
+# Chat function
 def respond(message):
-    # Use the message as the prompt
     prompt = f"{message}\n"
-    
-    # Generate output from the model
-    output = chatbot(prompt, do_sample=True, temperature=0.7)[0]["generated_text"]
-    
-    # Strip the input from the output to return only the model’s reply
-    reply = output.replace(prompt, "").strip()
-    
+    output = chatbot(prompt)[0]["generated_text"]
+    reply = output.replace(prompt, "").strip() if prompt in output else output.strip()
     return reply
 
-# Create a Gradio interface to interact with the chatbot
+# Gradio UI
 demo = gr.Interface(
-    fn=respond,                               # Function to call when user submits input
-    inputs=gr.Textbox(label="Ask something"), # Input field for user's question
-    outputs=gr.Textbox(label="Response"),     # Output field for model's reply
-    title="JSTcuriousAI42 Chatbot"            # Title shown on the UI
+    fn=respond,
+    inputs=gr.Textbox(label="Ask something"),
+    outputs=gr.Textbox(label="Response"),
+    title="JSTcuriousAI42 Chatbot"
 )
 
-# Launch the Gradio app (starts the server and opens the web interface)
+# Launch app
 demo.launch()
