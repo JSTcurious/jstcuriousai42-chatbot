@@ -9,5 +9,5 @@ app_file: app.py
 pinned: false
 ---
 
-A chatbot assistant powered by Hugging Face models and APIs, part of the `jstcuriousai42.com` portal — where curiosity meets intelligent systems.
+A chatbot using Mistral-7B-Instruct, built by @thakurjitu to explore LLMs and GenAI from scratch.
 
