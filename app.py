@@ -1,47 +1,52 @@
-import gradio as gr
 import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+import gradio as gr
+import threading
 import os
-from transformers import AutoTokenizer, AutoModelForCausalLM
 
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-hf_token = os.environ.get("HF_TOKEN")  # Needed for gated model access
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
-
-# Load tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(model_id, token=hf_token)
+hf_token = os.environ.get("HF_TOKEN")
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, token=hf_token)
-
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
-    token=hf_token,
     device_map="auto",
-    torch_dtype=torch.bfloat16
+    torch_dtype=torch.bfloat16,
+    token=hf_token
 )
 
-# Define response function
-def respond(user_message):
-    messages = [
-        {"role": "system", "content": "You are a helpful, friendly AI assistant created by Jitender to explore Generative AI."},
-        {"role": "user", "content": user_message}
-    ]
-    inputs = tokenizer.apply_chat_template(messages, return_tensors="pt").to(model.device)
-    outputs = model.generate(inputs, max_new_tokens=256)
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response.split(user_message)[-1].strip()
+def generate_response_stream(prompt):
+    messages = [{"role": "user", "content": prompt}]
+    inputs = tokenizer.apply_chat_template(
+        messages,
+        return_tensors="pt",
+        add_generation_prompt=True
+    ).to(model.device)
 
-# Gradio UI
-with gr.Blocks(title="JSTcuriousAI42 Chatbot") as demo:
-    gr.Markdown("## 🤖 JSTcuriousAI42 Chatbot powered by Mistral 7B v0.3")
-    with gr.Row():
-        user_input = gr.Textbox(label="Your question", placeholder="Ask me anything...", lines=2)
-    with gr.Row():
-        response = gr.Textbox(label="Response", lines=6)
-    with gr.Row():
-        submit_btn = gr.Button("Get Answer")
-        submit_btn.click(fn=respond, inputs=user_input, outputs=response)
+    streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    generation_kwargs = {
+        "inputs": inputs,
+        "streamer": streamer,
+        "max_new_tokens": 128,
+        "temperature": 0.7,
+        "do_sample": False
+    }
+
+    thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
+    thread.start()
+
+    response = ""
+    for token in streamer:
+        response += token
+        yield response.replace("\n", "<br>")
+
+with gr.Blocks(title="JSTcurious Chatbot") as demo:
+    gr.Markdown("## 🤖 JSTcurious Chatbot powered by Mistral 7B v0.3")
+    prompt = gr.Textbox(label="Your question", placeholder="Ask me anything...")
+    response = gr.Markdown(label="Response", show_label=True)
+    submit = gr.Button("Get Answer")
+
+    submit.click(fn=generate_response_stream, inputs=prompt, outputs=response, show_progress=True)
 
 demo.launch()
 

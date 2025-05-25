@@ -1,7 +1,7 @@
-gradio==5.31.0
-transformers==4.42.2
-torch==2.2.2
-accelerate
-numpy<2
-sentencepiece
+gradio==5.31.0                  # UI framework with streaming support
+transformers==4.42.2            # Required for Mistral v0.3 + chat_template + streaming
+torch==2.2.2                    # GPU-compatible for inference
+accelerate                      # Optional but useful for device_map="auto"
+numpy<2                         # Avoids compatibility issues with torch extensions
+sentencepiece                   # Required for Mistral tokenizer
 
