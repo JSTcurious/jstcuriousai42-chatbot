@@ -10,6 +10,7 @@ print(f"Using device: {'GPU' if device == 0 else 'CPU'}")
 chatbot = pipeline(
     "text-generation",
     model="HuggingFaceH4/zephyr-7b-beta",
+#   model="sshleifer/tiny-gpt2",
     device=device,
     max_new_tokens=256,
     do_sample=True,
